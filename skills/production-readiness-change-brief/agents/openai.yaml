@@ -1,0 +1,5 @@
+interface:
+  display_name: "Production Readiness Change Brief"
+  short_description: "Create data-driven HTML change briefs"
+  brand_color: "#0F766E"
+  default_prompt: "Use $production-readiness-change-brief to create a dated HTML and JSON brief for these review findings."

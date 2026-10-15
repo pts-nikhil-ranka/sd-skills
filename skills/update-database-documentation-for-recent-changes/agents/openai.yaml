@@ -1,0 +1,3 @@
+interface:
+  display_name: "Update Database Documentation for Recent Changes"
+  short_description: "Document only database changes from recent conversation"

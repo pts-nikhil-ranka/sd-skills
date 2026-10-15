@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Commit Message"
+  short_description: "Draft commit messages from Git diffs"
+  default_prompt: "Use $commit-message-generator to draft a concise commit message from the current Git diff."

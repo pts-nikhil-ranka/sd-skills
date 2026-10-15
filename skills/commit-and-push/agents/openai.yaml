@@ -1,0 +1,4 @@
+interface:
+  display_name: "Commit and Push"
+  short_description: "Commit verified changes and push safely"
+  default_prompt: "Use $commit-and-push to generate the commit message, commit the intended changes, and push the current branch to origin."

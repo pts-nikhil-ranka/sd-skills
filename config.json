@@ -1,0 +1,6 @@
+{
+  "sources": [
+    { "id": "codex", "path": "~/.codex/skills" }
+  ],
+  "projects": []
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Readiness Review"
+  short_description: "Review code and file concise GitHub issues"
+  default_prompt: "Use $github-production-readiness-review to review this repository and file concise, evidence-backed GitHub issues."

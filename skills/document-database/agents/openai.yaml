@@ -1,0 +1,4 @@
+interface:
+  display_name: "Database Guide"
+  short_description: "HTML database guides linking tables to application actions"
+  default_prompt: "Use $document-database to create an HTML guide connecting this application's database structure to verified user actions and data flows."

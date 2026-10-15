@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Production-readiness review</title>
+  <style>
+    :root {
+      --page: #eef4f2;
+      --surface: #ffffff;
+      --surface-muted: #f6f9f8;
+      --ink: #16302f;
+      --muted: #5e7371;
+      --line: #d6e2df;
+      --brand: #0f766e;
+      --brand-deep: #0b4f4a;
+      --brand-pale: #dff3ef;
+      --p1: #b42318;
+      --p1-pale: #fee4e2;
+      --p2: #b54708;
+      --p2-pale: #ffead5;
+      --shadow: 0 18px 50px rgba(21, 48, 47, 0.10);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(15, 118, 110, 0.16), transparent 30rem),
+        linear-gradient(180deg, #f8fbfa 0, var(--page) 28rem);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button, input { font: inherit; }
+
+    button:focus-visible,
+    input:focus-visible,
+    a:focus-visible {
+      outline: 3px solid rgba(15, 118, 110, 0.35);
+      outline-offset: 3px;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 64px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: #f4fffd;
+      background: linear-gradient(135deg, #0b3836 0%, #0f625c 62%, #128277 100%);
+      border-radius: var(--radius-lg);
+      padding: clamp(28px, 5vw, 56px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 350px;
+      height: 350px;
+      right: -150px;
+      top: -180px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 50%;
+      box-shadow: 0 0 0 54px rgba(255, 255, 255, 0.04), 0 0 0 108px rgba(255, 255, 255, 0.03);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #9ce7dd;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 850px;
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4.2rem);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+    }
+
+    .purpose {
+      max-width: 790px;
+      margin: 20px 0 0;
+      color: #d7f4ef;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .meta-pill {
+      padding: 8px 12px;
+      color: #eafffb;
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      font-size: 0.86rem;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 20px 0;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      backdrop-filter: blur(16px);
+    }
+
+    .toolbar-actions,
+    .filters {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .status {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .button,
+    .file-label,
+    .filter-button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 13px;
+      color: var(--ink);
+      background: var(--surface);
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+    }
+
+    .button:hover,
+    .file-label:hover,
+    .filter-button:hover {
+      transform: translateY(-1px);
+      border-color: #8eb8b2;
+    }
+
+    .file-label input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    .filter-button[aria-pressed="true"] {
+      color: #fff;
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: 20px 0;
+    }
+
+    .metric {
+      min-height: 125px;
+      padding: 22px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 26px rgba(21, 48, 47, 0.05);
+    }
+
+    .metric-value {
+      display: block;
+      font-size: 2rem;
+      font-weight: 850;
+      letter-spacing: -0.04em;
+    }
+
+    .metric-label {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .intro,
+    .empty-state {
+      margin: 20px 0;
+      padding: 22px 24px;
+      background: var(--brand-pale);
+      border: 1px solid #b8ddd7;
+      border-radius: var(--radius-md);
+    }
+
+    .intro p,
+    .empty-state p { margin: 0; }
+
+    .review-list {
+      display: grid;
+      gap: 22px;
+    }
+
+    .review-card {
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 12px 34px rgba(21, 48, 47, 0.07);
+    }
+
+    .review-card[hidden] { display: none; }
+
+    .card-head {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: start;
+      gap: 16px;
+      padding: 24px 26px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff, #f9fbfa);
+    }
+
+    .index {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: var(--brand-deep);
+      background: var(--brand-pale);
+      border-radius: 12px;
+      font-weight: 850;
+    }
+
+    .card-title {
+      margin: 1px 0 0;
+      font-size: clamp(1.18rem, 2vw, 1.5rem);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+
+    .priority {
+      display: inline-flex;
+      align-items: center;
+      min-width: 44px;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 850;
+    }
+
+    .priority-p1 { color: var(--p1); background: var(--p1-pale); }
+    .priority-p2 { color: var(--p2); background: var(--p2-pale); }
+
+    .card-body {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .discussion {
+      padding: 26px;
+      background: var(--surface);
+    }
+
+    .discussion.full { grid-column: 1 / -1; }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 12px;
+      color: var(--brand-deep);
+      font-size: 0.78rem;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .section-label::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      background: var(--brand);
+      border-radius: 50%;
+    }
+
+    .discussion p { margin: 0; }
+
+    .implementation-list,
+    .acceptance-list {
+      margin: 12px 0 0;
+      padding-left: 20px;
+    }
+
+    .implementation-list li,
+    .acceptance-list li { margin: 7px 0; }
+
+    .file-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .file-row {
+      display: grid;
+      grid-template-columns: minmax(210px, 0.9fr) minmax(0, 1.6fr);
+      gap: 16px;
+      padding: 13px 14px;
+      background: var(--surface-muted);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+    }
+
+    .file-path {
+      overflow-wrap: anywhere;
+      color: var(--brand-deep);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.82rem;
+      font-weight: 750;
+    }
+
+    .file-reason { color: var(--muted); }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.82rem;
+    }
+
+    .loading .content { opacity: 0.55; pointer-events: none; }
+
+    @media (max-width: 850px) {
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .card-body { grid-template-columns: 1fr; }
+      .discussion.full { grid-column: auto; }
+      .file-row { grid-template-columns: 1fr; gap: 5px; }
+    }
+
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 20px, 1180px); padding-top: 10px; }
+      .hero { border-radius: 18px; }
+      .toolbar { align-items: flex-start; flex-direction: column; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .card-head { grid-template-columns: auto 1fr; padding: 20px; }
+      .priority { grid-column: 2; justify-self: start; }
+      .discussion { padding: 21px; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #0d1716;
+        --surface: #142220;
+        --surface-muted: #192927;
+        --ink: #e2f1ee;
+        --muted: #9fb4b0;
+        --line: #2c403d;
+        --brand-pale: #183b37;
+        --p1-pale: #4b2221;
+        --p2-pale: #49311f;
+        --shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+      }
+
+      body {
+        background: radial-gradient(circle at 8% 0%, rgba(15, 118, 110, 0.2), transparent 30rem), var(--page);
+      }
+
+      .toolbar { background: rgba(20, 34, 32, 0.88); }
+      .card-head { background: linear-gradient(180deg, #182825, #142220); }
+      .intro, .empty-state { border-color: #2c5b55; }
+    }
+
+    @media print {
+      :root { color-scheme: light; }
+      body { background: #fff; }
+      .shell { width: 100%; padding: 0; }
+      .hero { color: #fff; box-shadow: none; }
+      .toolbar, .footer { display: none; }
+      .review-list { display: block; }
+      .review-card { margin: 16px 0; box-shadow: none; break-inside: avoid; }
+      .review-card[hidden] { display: block; }
+    }
+  </style>
+</head>
+<body class="loading">
+  <main class="shell">
+    <header class="hero">
+      <p class="eyebrow" id="report-type">Production-readiness change brief</p>
+      <h1 id="report-title">Loading review…</h1>
+      <p class="purpose" id="report-purpose">Loading the matching JSON data file.</p>
+      <div class="meta-row" id="meta-row" aria-label="Report metadata"></div>
+    </header>
+
+    <section class="toolbar" aria-label="Report controls">
+      <div>
+        <div class="toolbar-actions">
+          <label class="file-label">
+            Load JSON
+            <input id="file-input" type="file" accept="application/json,.json">
+          </label>
+          <button class="button" id="print-button" type="button">Print / Save PDF</button>
+        </div>
+        <p class="status" id="load-status" role="status" aria-live="polite">Loading…</p>
+      </div>
+      <div class="filters" id="filters" aria-label="Filter changes by priority"></div>
+    </section>
+
+    <div class="content">
+      <section class="summary-grid" id="summary-grid" aria-label="Review summary"></section>
+      <section class="intro" id="intro"><p></p></section>
+      <section class="review-list" id="review-list" aria-label="Proposed changes"></section>
+      <section class="empty-state" id="empty-state" hidden>
+        <p>No changes match the selected priority.</p>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <span id="source-note">Data-driven report. Review content is loaded from JSON.</span>
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const elements = {
+        title: document.getElementById("report-title"),
+        type: document.getElementById("report-type"),
+        purpose: document.getElementById("report-purpose"),
+        meta: document.getElementById("meta-row"),
+        status: document.getElementById("load-status"),
+        filters: document.getElementById("filters"),
+        summary: document.getElementById("summary-grid"),
+        intro: document.querySelector("#intro p"),
+        list: document.getElementById("review-list"),
+        empty: document.getElementById("empty-state"),
+        fileInput: document.getElementById("file-input"),
+        printButton: document.getElementById("print-button"),
+        source: document.getElementById("source-note")
+      };
+
+      const state = { report: null, priority: "all", sourceName: "" };
+
+      const create = (tag, className, text) => {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text !== undefined && text !== null) node.textContent = String(text);
+        return node;
+      };
+
+      const addTextList = (parent, values, className) => {
+        const list = create("ul", className);
+        (values || []).forEach(value => list.append(create("li", "", value)));
+        parent.append(list);
+      };
+
+      const normalizePriority = value => String(value || "P2").toUpperCase();
+
+      const validate = report => {
+        if (!report || typeof report !== "object") throw new Error("The JSON root must be an object.");
+        if (!report.report || typeof report.report !== "object") throw new Error("Missing report metadata.");
+        if (!Array.isArray(report.changes)) throw new Error("The changes field must be an array.");
+        report.changes.forEach((change, index) => {
+          ["title", "withoutChange", "withChange"].forEach(field => {
+            if (!change[field]) throw new Error(`Change ${index + 1} is missing ${field}.`);
+          });
+          if (!change.implementation || !Array.isArray(change.implementation.files)) {
+            throw new Error(`Change ${index + 1} is missing implementation.files.`);
+          }
+        });
+        return report;
+      };
+
+      const metric = (value, label) => {
+        const node = create("article", "metric");
+        node.append(create("span", "metric-value", value));
+        node.append(create("span", "metric-label", label));
+        return node;
+      };
+
+      const renderSummary = changes => {
+        elements.summary.textContent = "";
+        const p1 = changes.filter(change => normalizePriority(change.priority) === "P1").length;
+        const p2 = changes.filter(change => normalizePriority(change.priority) === "P2").length;
+        const files = new Set(changes.flatMap(change => change.implementation.files.map(file => file.path)));
+        elements.summary.append(metric(changes.length, "Proposed changes"));
+        elements.summary.append(metric(p1, "Must-have / P1"));
+        elements.summary.append(metric(p2, "Important / P2"));
+        elements.summary.append(metric(files.size, "Files in scope"));
+      };
+
+      const renderFiles = files => {
+        const container = create("div", "file-grid");
+        files.forEach(file => {
+          const row = create("div", "file-row");
+          row.append(create("div", "file-path", file.path));
+          row.append(create("div", "file-reason", file.reason));
+          container.append(row);
+        });
+        return container;
+      };
+
+      const discussion = (label, text, full = false) => {
+        const node = create("section", `discussion${full ? " full" : ""}`);
+        node.append(create("h3", "section-label", label));
+        node.append(create("p", "", text));
+        return node;
+      };
+
+      const renderCard = (change, index) => {
+        const priority = normalizePriority(change.priority);
+        const card = create("article", "review-card");
+        card.dataset.priority = priority;
+        card.id = change.id || `change-${index + 1}`;
+
+        const head = create("header", "card-head");
+        head.append(create("div", "index", String(index + 1).padStart(2, "0")));
+        head.append(create("h2", "card-title", change.title));
+        head.append(create("span", `priority priority-${priority.toLowerCase()}`, priority));
+        card.append(head);
+
+        const body = create("div", "card-body");
+        body.append(discussion("Without the change", change.withoutChange));
+        body.append(discussion("What the change will do", change.withChange));
+
+        const implementation = create("section", "discussion full");
+        implementation.append(create("h3", "section-label", "How it will be implemented"));
+        implementation.append(create("p", "", change.implementation.approach));
+        if (change.implementation.steps?.length) {
+          addTextList(implementation, change.implementation.steps, "implementation-list");
+        }
+        implementation.append(create("h3", "section-label", "Files to touch"));
+        implementation.append(renderFiles(change.implementation.files));
+        body.append(implementation);
+
+        if (change.acceptanceChecks?.length) {
+          const acceptance = create("section", "discussion full");
+          acceptance.append(create("h3", "section-label", "Acceptance checks"));
+          addTextList(acceptance, change.acceptanceChecks, "acceptance-list");
+          body.append(acceptance);
+        }
+
+        card.append(body);
+        return card;
+      };
+
+      const applyFilter = () => {
+        let visible = 0;
+        elements.list.querySelectorAll(".review-card").forEach(card => {
+          const show = state.priority === "all" || card.dataset.priority === state.priority;
+          card.hidden = !show;
+          if (show) visible += 1;
+        });
+        elements.empty.hidden = visible !== 0;
+      };
+
+      const renderFilters = changes => {
+        const priorities = [...new Set(changes.map(change => normalizePriority(change.priority)))];
+        elements.filters.textContent = "";
+        ["all", ...priorities].forEach(priority => {
+          const label = priority === "all" ? "All" : priority;
+          const button = create("button", "filter-button", label);
+          button.type = "button";
+          button.setAttribute("aria-pressed", String(state.priority === priority));
+          button.addEventListener("click", () => {
+            state.priority = priority;
+            elements.filters.querySelectorAll("button").forEach(item => {
+              item.setAttribute("aria-pressed", String(item === button));
+            });
+            applyFilter();
+          });
+          elements.filters.append(button);
+        });
+      };
+
+      const render = (report, sourceName) => {
+        state.report = validate(report);
+        state.sourceName = sourceName;
+        state.priority = "all";
+
+        const metadata = report.report;
+        document.title = metadata.title || "Production-readiness review";
+        elements.type.textContent = metadata.type || "Production-readiness change brief";
+        elements.title.textContent = metadata.title;
+        elements.purpose.textContent = metadata.purpose;
+        elements.meta.textContent = "";
+        [
+          `Date: ${metadata.date}`,
+          metadata.repository ? `Repository: ${metadata.repository}` : "",
+          metadata.scope ? `Scope: ${metadata.scope}` : ""
+        ].filter(Boolean).forEach(value => elements.meta.append(create("span", "meta-pill", value)));
+
+        elements.intro.textContent = metadata.summary || "";
+        renderSummary(report.changes);
+        renderFilters(report.changes);
+        elements.list.textContent = "";
+        report.changes.forEach((change, index) => elements.list.append(renderCard(change, index)));
+        applyFilter();
+
+        elements.status.textContent = `Loaded ${sourceName}`;
+        elements.source.textContent = `Content source: ${sourceName}`;
+        document.body.classList.remove("loading");
+      };
+
+      const showLoadError = (message, sourceName) => {
+        document.body.classList.remove("loading");
+        elements.title.textContent = "Choose the review JSON file";
+        elements.purpose.textContent = "The browser could not automatically read the matching data file. Use Load JSON above; the report remains entirely local.";
+        elements.status.textContent = `${sourceName}: ${message}`;
+        elements.intro.textContent = "Tip: automatic loading works when this directory is served over HTTP. Direct file access can restrict JSON fetches in some browsers.";
+      };
+
+      const loadFromFile = file => {
+        const reader = new FileReader();
+        reader.addEventListener("load", () => {
+          try {
+            render(JSON.parse(String(reader.result)), file.name);
+          } catch (error) {
+            showLoadError(error.message, file.name);
+          }
+        });
+        reader.addEventListener("error", () => showLoadError("Unable to read the selected file.", file.name));
+        reader.readAsText(file);
+      };
+
+      elements.fileInput.addEventListener("change", event => {
+        const [file] = event.target.files;
+        if (file) loadFromFile(file);
+      });
+      elements.printButton.addEventListener("click", () => window.print());
+
+      const pageName = decodeURIComponent(window.location.pathname.split("/").pop() || "review.html");
+      const defaultData = pageName.replace(/\.html?$/i, ".json");
+      const requestedData = new URLSearchParams(window.location.search).get("data") || defaultData;
+      fetch(requestedData, { cache: "no-store" })
+        .then(response => {
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return response.json();
+        })
+        .then(report => render(report, requestedData))
+        .catch(error => showLoadError(error.message, requestedData));
+    })();
+  </script>
+</body>
+</html>

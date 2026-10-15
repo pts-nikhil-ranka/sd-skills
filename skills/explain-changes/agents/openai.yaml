@@ -1,0 +1,6 @@
+interface:
+  display_name: "Explain Changes"
+  short_description: "Explain code changes clearly and accurately"
+  default_prompt: "Use $explain-changes to explain the current edited files and their effects."
+policy:
+  allow_implicit_invocation: true

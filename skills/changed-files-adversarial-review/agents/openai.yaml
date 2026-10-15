@@ -1,0 +1,4 @@
+interface:
+  display_name: "Changed Files Adversarial Review"
+  short_description: "Attack only the current conversation changes"
+  default_prompt: "Use $changed-files-adversarial-review to attack only the changes made in this conversation and report consequential defects."

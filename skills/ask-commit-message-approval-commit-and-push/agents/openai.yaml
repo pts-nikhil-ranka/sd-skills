@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ask Commit Message Approval, Commit, and Push"
+  short_description: "Approve, commit, verify, and push"
+  default_prompt: "Use $ask-commit-message-approval-commit-and-push to propose a commit message, get my one-time approval, commit the agreed changes, and push to origin."

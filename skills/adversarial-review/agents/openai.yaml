@@ -1,0 +1,4 @@
+interface:
+  display_name: "Adversarial Review"
+  short_description: "Attack failure paths; report material defects"
+  default_prompt: "Use $adversarial-review to attack this application's failure paths and report only consequential defects."

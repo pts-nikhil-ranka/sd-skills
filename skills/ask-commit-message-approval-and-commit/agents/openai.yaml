@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ask Commit Message Approval and Commit"
+  short_description: "Commit after message approval"
+  default_prompt: "Use $ask-commit-message-approval-and-commit to propose a commit message, get my one-time approval, and commit the agreed changes."
