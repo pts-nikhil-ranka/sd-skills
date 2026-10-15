@@ -1,4 +1,4 @@
-# PTS Skills Sync Kit
+# SD Skills Sync Kit
 
 A local-to-Cloud synchronization helper for macOS/Linux, Python 3.9+.
 
@@ -13,10 +13,10 @@ A local-to-Cloud synchronization helper for macOS/Linux, Python 3.9+.
 
 ## Initial commands
 
-Extract this directory to `~/pts-skills`.
+Extract this directory to `~/sd-skills`.
 
 ```sh
-cd ~/pts-skills
+cd ~/sd-skills
 python3 skills_sync.py collect
 ls skills
 ```
@@ -25,12 +25,12 @@ Inspect generated files, including checking for sensitive data, before publishin
 Create a PRIVATE GitHub repository for the hub (using `gh`, if available):
 
 ```sh
-cd ~/pts-skills
+cd ~/sd-skills
 git init
 git add .
 git diff --cached --stat
 git commit -m 'Initial skill snapshot'
-gh repo create pts-skills --private --source=. --remote=origin --push
+gh repo create sd-skills --private --source=. --remote=origin --push
 ```
 
 ## Deploy to each application repository
@@ -97,7 +97,7 @@ python3 skills_sync.py deploy-all
 ## Verify
 
 ```sh
-find ~/pts-skills/skills -mindepth 2 -maxdepth 2 -name SKILL.md
+find ~/sd-skills/skills -mindepth 2 -maxdepth 2 -name SKILL.md
 find ~/code/my-app/.agents/skills -mindepth 2 -maxdepth 2 -name SKILL.md
 ```
 
