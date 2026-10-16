@@ -1,6 +1,13 @@
 {
   "sources": [
-    { "id": "codex", "path": "~/.codex/skills" }
+    {
+      "id": "codex",
+      "path": "~/.codex/skills"
+    },
+    {
+      "id": "repository-authored",
+      "path": "./authored-skills"
+    }
   ],
   "projects": []
 }

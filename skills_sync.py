@@ -100,7 +100,10 @@ def discover(data):
     metadata_names = {}
     for entry in data['sources']:
         source_id = entry.get('id', '<unnamed>')
-        src = Path(os.path.expanduser(entry['path'])).resolve()
+        src = Path(os.path.expanduser(entry['path']))
+        if not src.is_absolute():
+            src = ROOT / src
+        src = src.resolve()
         if not src.is_dir():
             fail(f'Source directory does not exist: {src}')
         count = 0

@@ -2,6 +2,26 @@
 
 A local-to-Cloud synchronization helper for macOS/Linux, Python 3.9+.
 
+## Shared frontend standards (canonical source)
+
+The repository includes the agent-neutral `frontend-standards` skill with mandatory numbered rules:
+
+- **FE-001:** API-triggering buttons disable and show a spinner before the label while pending, clearing the loading state on either success or failure.
+- **FE-002:** Applicable WCAG 2.1 Level AA requirements, including keyboard and screen-reader support, focus management and accessible feedback.
+- **FE-003:** When temporary floating user-action feedback is used, show it at bottom-right and auto-dismiss after a few seconds, subject to accessibility safeguards. Inline status feedback is exempt.
+
+**Edit only `authored-skills/frontend-standards/`** when principles change. `skills/frontend-standards/` is a **generated snapshot** used by the existing deploy workflow. Running `python3 skills_sync.py collect` combines repository-authored skills with configured personal-skill sources and rebuilds the snapshot without losing the canonical standards.
+
+The skill uses the portable Agent Skills `SKILL.md` format for use with Codex, Claude Code, and OpenCode. The current deployment helper publishes snapshots to **`.agents/skills/`** for Codex-style project discovery. Claude Code typically requires installation into **`.claude/skills/`** (or its user skill directory); cross-agent installation and always-on instruction adapters are a planned follow-up, **not yet configured**. Hosting a skill in GitHub alone does not make agents automatically discover it.
+
+To update the standards:
+
+```sh
+# From this repository's root, after editing authored-skills/frontend-standards/
+python3 skills_sync.py collect
+# Review generated skills/frontend-standards/ and commit source plus snapshot.
+```
+
 ## Assumptions
 
 - Your currently authored personal skills are stored as immediate subdirectories
